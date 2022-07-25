@@ -1,14 +1,27 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 const Chat = (props) => {
   const { socket, username, room } = props  
   const [currentMessage, setCurrentMessage] = useState("")
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (currentMessage !== "") {
-
+        const messageData = {
+            room,
+            author: username,
+            message: currentMessage,
+            time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes()
+        }
+        await socket.emit('send_message', messageData);
     }
   }
+
+  useEffect(() => {
+    socket.on('receive_message', (data) => {
+        console.log(data)
+    })
+  }, [socket])
+  
 
   return (
     <div>
